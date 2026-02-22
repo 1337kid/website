@@ -117,6 +117,7 @@ export const EventCard = ({
   const isInCarousel = !onDragEnd || position === undefined;
 
   const handleCardClick = (e) => {
+    console.log("Card clicked", id);
     if (!isInCarousel && !hasMoved) {
       router.push(`/events/${id}`);
     } else if (isInCarousel) {

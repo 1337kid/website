@@ -6,13 +6,13 @@ import { ArrowLeft, Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import bg from "@/assets/bg.svg";
-import { bucketBase, supabase } from "@/lib/supabase";
 import CircularGallery from "@/components/reactbits/CircularGallery";
+import { client } from "@/sanity/lib/client";
 
 const EventDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
-  const eventId = parseInt(params.id);
+  const eventId = params.id;
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,11 +36,22 @@ const EventDetailsPage = () => {
       try {
         setLoading(true);
 
-        const { data, error } = await supabase
-          .from("events")
-          .select("*")
-          .eq("id", eventId)
-          .single();
+        const data = await client.fetch(`
+        *[_type == "event" && _id == "${eventId}"][0]{
+            _id,
+            name,
+            event_oneline,
+            event_short_desc,
+            event_content,
+            event_venue,
+            year,
+            cover_image{
+              asset->{
+                url
+              }
+            }
+          }  
+        `)
 
         if (error) {
           throw error;
@@ -189,7 +200,7 @@ const EventDetailsPage = () => {
                 <div className="relative w-full h-full p-1 sm:p-2">
                   <div className="relative w-full h-full overflow-hidden">
                     <Image
-                      src={bucketBase + event.year + "/" + event.cover_image}
+                      src={event.cover_image.asset.url}
                       alt={event.name}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -277,7 +288,7 @@ const EventDetailsPage = () => {
           </div>
 
           {/* Gallery Section */}
-          {shouldShowGallery && (
+          {/* {shouldShowGallery && (
             <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
               <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px]">
                 <CircularGallery
@@ -290,7 +301,7 @@ const EventDetailsPage = () => {
                 />
               </div>
             </section>
-          )}
+          )} */}
         </div>
       </div>
     </div>

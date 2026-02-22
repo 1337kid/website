@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import useMediaQuery from "@/hooks/use-media-query";
-import { bucketBase, supabase } from "@/lib/supabase";
+import { client } from "@/sanity/lib/client";
 
 const Events = () => {
   const isMobile = useMediaQuery("(max-width: 920px)");
@@ -124,10 +124,20 @@ const Events = () => {
       try {
         setLoading(true);
 
-        const { data, error } = await supabase
-          .from("events")
-          .select("*")
-          .order("id", { ascending: true });
+        const data = await client.fetch(`
+          *[_type == "event"]{
+            _id,
+            name,
+            event_short_desc,
+            year,
+            "slug": slug.current,
+            cover_image{
+              asset->{
+                url
+              }
+            }
+          }
+        `)
 
         if (error) {
           throw error;
@@ -137,11 +147,11 @@ const Events = () => {
           // Map Supabase data to card format with positions
           const positions = getInitialPositions();
           const mappedEvents = data.map((event, index) => ({
-            id: event.id,
+            id: event._id,
             title: event.name,
             borderColor: getBorderColor(index),
             position: positions[index] || calculateFallbackPosition(index, positions.length),
-            image: `${bucketBase}/${event.year}/${event.cover_image}`,
+            image: event.cover_image.asset.url,
             backContent: event.event_short_desc,
             year: event.year,
           }));
@@ -359,9 +369,9 @@ const Events = () => {
                     minHeight: cards.length > 0 ? `${calculateContainerHeight(cards.length)}px` : '800px'
                   }}
                 >
-                  {cards.map((card) => (
+                  {cards.map((card, index) => (
                     <EventCard
-                      key={card.id}
+                      key={index}
                       id={card.id}
                       title={card.title}
                       borderColor={card.borderColor}

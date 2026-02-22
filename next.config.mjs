@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable hot reloading in Docker
-  webpack: (config, { dev }) => {
+  turbopack: (config, { dev }) => {
     if (dev) {
       config.watchOptions = {
         poll: 1000,
@@ -9,11 +9,6 @@ const nextConfig = {
       };
     }
     return config;
-  },
-  // Configure the dev server to work with Docker
-  experimental: {
-    // Enable hot reloading
-    forceSwcTransforms: true,
   },
   // Ensure the app works with Docker networking
   async rewrites() {
@@ -24,9 +19,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'zyolfylglkqvlkttrxas.supabase.co',
+        hostname: 'cdn.sanity.io',
         port: '',
-        pathname: '/storage/v1/object/public/**',
+        pathname: '/images/n3rhrsv8/production/**',
       },
     ],
   },
