@@ -19,9 +19,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'zyolfylglkqvlkttrxas.supabase.co',
+        hostname: 'cdn.sanity.io',
         port: '',
-        pathname: '/storage/v1/object/public/**',
+        pathname: '/images/n3rhrsv8/production/**',
       },
     ],
   },
