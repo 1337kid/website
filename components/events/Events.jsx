@@ -194,17 +194,20 @@ const Events = () => {
             position: { x: 0, y: 0 }, // placeholder
             image: event.cover_image.asset.url,
             backContent: event.event_short_desc,
-            year: event.year,
+            year: parseInt(event.year),
           }));
 
-          const currentYear = new Date().getFullYear();
-          const currentYearEvents = mappedEvents.filter(
-            (e) => e.year === currentYear
+          const availableYears = [...new Set(mappedEvents.map((e) => e.year))].sort(
+            (a, b) => b - a
+          );
+          const defaultYear = availableYears[0]; // most recent year in data
+          const defaultYearEvents = mappedEvents.filter(
+            (e) => e.year === defaultYear
           );
 
           setAllEvents(mappedEvents);
-          setSelectedYear(currentYear);
-          setCards(applyPositions(currentYearEvents));
+          setSelectedYear(defaultYear);
+          setCards(applyPositions(defaultYearEvents));
           setIsInitialized(true);
         }
       } catch (err) {
@@ -292,7 +295,7 @@ const Events = () => {
                     value={year.toString()}
                     className="bg-[#1a1a1a] text-[#DAE2E9E0]"
                   >
-                    Events {year}
+                    Events {year} - {year+1}
                   </option>
                 ))}
               </select>
