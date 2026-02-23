@@ -30,3 +30,5 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 | Midhun Unni | 23-CSA |
 | Niranjana Siju | 23-CSA |
 | Vasanth R | 23-CSA |
+| Nimah Zayn | 24-CU |
+| Dijith Dinesh | 24-CU |
