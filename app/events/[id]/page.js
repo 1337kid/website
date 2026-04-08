@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, MapPin } from "lucide-react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import bg from "@/assets/bg.svg";
-import CircularGallery from "@/components/reactbits/CircularGallery";
+import EventGalleryMarquee from "@/components/events/EventGalleryMarquee";
 import { client } from "@/sanity/lib/client";
 
 const EventDetailsPage = () => {
@@ -20,14 +20,18 @@ const EventDetailsPage = () => {
 
   // Get gallery images from event data
   const getGalleryImages = () => {
-    if (!event || !event.images || !Array.isArray(event.images)) {
+    if (
+      !event ||
+      !event.gallery_images ||
+      !Array.isArray(event.gallery_images)
+    ) {
       return [];
     }
 
     // Filter out empty or invalid image paths
-    return event.images.filter(
-      (img) => img && typeof img === "string" && img.trim() !== ""
-    );
+    return event.gallery_images
+      .map((img) => img.asset.url)
+      .filter((img) => img && typeof img === "string" && img.trim() !== "");
   };
 
   // Fetch event data from Supabase
@@ -49,9 +53,15 @@ const EventDetailsPage = () => {
               asset->{
                 url
               }
+            },
+            gallery_images[]{
+              _key,
+              asset->{
+                url
+              }
             }
-          }  
-        `)
+          }
+`);
 
         if (error) {
           throw error;
@@ -105,19 +115,6 @@ const EventDetailsPage = () => {
 
   const galleryImages = getGalleryImages();
   const hasGalleryImages = galleryImages.length > 0;
-
-  const getCircularGalleryItems = () => {
-    if (!hasGalleryImages) return [];
-
-    return galleryImages.map((imageSrc, index) => ({
-      image: bucketBase + event.year + "/" + imageSrc,
-      text: `${event.name} - ${index + 1}`,
-    }));
-  };
-
-  const circularGalleryItems = getCircularGalleryItems();
-
-  const shouldShowGallery = hasGalleryImages && circularGalleryItems.length > 0;
 
   return (
     <div className="flex flex-col font-dm-mono overflow-x-hidden min-h-screen">
@@ -288,20 +285,13 @@ const EventDetailsPage = () => {
           </div>
 
           {/* Gallery Section */}
-          {/* {shouldShowGallery && (
+          {hasGalleryImages && (
             <section className="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
-              <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px]">
-                <CircularGallery
-                  items={circularGalleryItems}
-                  bend={0}
-                  textColor="#ffffff"
-                  borderRadius={0.02}
-                  scrollEase={0.05}
-                  showText={false}
-                />
+              <div className="relative w-full">
+                <EventGalleryMarquee images={galleryImages} />
               </div>
             </section>
-          )} */}
+          )}
         </div>
       </div>
     </div>
